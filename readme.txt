@@ -27,7 +27,7 @@ LOGIC:
 
 1. Calculation cell's position
 	position (z) calculating by values of col (y) and row (x):
-		z = (x-1) * x + y
+		z = (x-1) * cols amount + y
 		
 2. Moving
 	check whether the coordinates for next point for HEAD and coordinates of any body part are same
