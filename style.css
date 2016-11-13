@@ -1,0 +1,21 @@
+
+#matrix {
+    width: 400px;
+    height: 400px;
+    margin: 50px 0 0 50px;
+
+    border-left: 1px solid black;
+    border-top: 1px solid black;
+}
+
+#matrix .cell {
+    display: inline-block;
+    float: left;
+    background-color: white;
+
+    width: 19px;
+    height: 19px;
+
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+}
