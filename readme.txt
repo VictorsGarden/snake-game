@@ -1,3 +1,6 @@
+algorythm, which I have created and using for this game
+if you'll use it, give me one million dollars ;P
+
 LOGIC:
 0) Cell have:
 			- coordinates (x,y),
