@@ -9,7 +9,7 @@ LOGIC:
 
 0. CELL
 	the direction register take value by different ways, depending on body part:
-		the head's register change direction straightway depending on what button-direction was pressed
+		the head's register change direction depending on what button-direction was pressed
 		other snake's body parts are dependent on next part and so up to the head
 		
 	so when player press button UP f.e.
@@ -24,7 +24,7 @@ LOGIC:
 
 1. Calculation cell's position
 	position (z) calculating by values of col (y) and row (x):
-		z = (x-y) * x + y
+		z = (x-1) * x + y
 		
 2. Moving
 	check whether the coordinates for next point for HEAD and coordinates of any body part are same
