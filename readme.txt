@@ -22,12 +22,12 @@ LOGIC:
 		BODY PART BEHAVIOR
 			1) move according to old direction
 			2) check for direction of next body part
-			2) if direction is different from current
-				change direction ACCORDING TO DIRECTION OF NEXT BODY PART
+			   if direction is different from current
+					change direction ACCORDING TO DIRECTION OF NEXT BODY PART
 
 1. Calculation cell's position
 	position (z) calculating by values of col (y) and row (x):
-		z = (x-1) * cols amount + y
+		z = (y-1) * cols amount + x
 		
 2. Moving
 	check whether the coordinates for next point for HEAD and coordinates of any body part are same
