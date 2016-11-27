@@ -364,7 +364,8 @@ Matrix.prototype.createFood = function(food, snake) {
     food.position = this.generateRandomCell()
     for (var i = 0; i < snake.length; i++) {
         if (food.position == snake[i].position) {
-            food.position = this.generateRandomCell()
+            i = 0;
+            food.position = this.generateRandomCell();
         }
     }
 
