@@ -17,9 +17,9 @@ headLeft = 'url(resources/snake-left.png)';
 
 // Establish colors for snake's part
 backgroundColor = "silver";
-headColor = "#00FF88";
-bodyPartColor = "#009C1F";
-tailColor = "#699E00";
+headColor = "#1FFF80";
+bodyPartColor = "#58C912";
+tailColor = "#1D6122";
 foodColor = "#cc0000";
 
 /***
