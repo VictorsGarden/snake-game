@@ -6,6 +6,7 @@
 input {
     width: 20px;
     height: 20px;
+    cursor: pointer;
 }
 
 html {
@@ -57,8 +58,8 @@ html {
     left: 0;
     right: 0;
     text-align: center;
-    width: 400px;
-    height: 300px;
+    width: 600px;
+    height: 500px;
     background-color: indigo;
 }
 
@@ -67,7 +68,7 @@ html {
     font-size: 55px;
     font-family: Shady-Lane;
     letter-spacing: 14px;
-    margin: 0 0 20px 0;
+    margin: 0 0 40px 0;
 }
 
 .greetings .game-block {
@@ -84,7 +85,7 @@ html {
     margin-bottom: 15px;
 }
 
-.start {
+button {
     cursor: pointer;
     border: none;
     width: 150px;
@@ -93,4 +94,39 @@ html {
     background-color: transparent;
     color: #2eb82e;
     font-family: Shady-Lane;
+
+    transition: all 1s;
+}
+
+.start:hover {
+    color: deepskyblue;
+}
+
+.author {
+    color: #4dffff;
+    text-decoration: none;
+    font-style: italic;
+    font-weight: bold;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    border-bottom: 1px solid transparent;
+    transition: all .5s;
+}
+
+.author:hover {
+    color: #ffff66;
+    border-color: #ffff66;
+}
+
+.greetings label {
+    transition: all .5s;
+}
+
+.greetings label.active {
+    color: gold;
+}
+
+.cell.headUp {
+    background-color: azure;
 }

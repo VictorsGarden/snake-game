@@ -8,14 +8,19 @@ const UP = 38;
 const RIGHT = 39;
 const DOWN = 40;
 
-// Establish cell's color
-color = "silver";
-
 // Establish images for snake parts
-headUp = 'resources/snake-up-right.png';
-headDown = 'resources/snake-down-left.png';
-headRight = 'resources/snake-right.png';
-headLeft = 'resources/snake-left.png';
+//TODO add images-logic
+headUp = 'url("resources/snake-up-right.png")';
+headDown = 'url(resources/snake-down-left.png)';
+headRight = 'url(resources/snake-right.png)';
+headLeft = 'url(resources/snake-left.png)';
+
+// Establish colors for snake's part
+backgroundColor = "silver";
+headColor = "#00FF88";
+bodyPartColor = "#009C1F";
+tailColor = "#699E00";
+foodColor = "#cc0000";
 
 /***
  * create field of DOM elements
@@ -90,6 +95,10 @@ Matrix.prototype.gameOver = function(cause) {
     newGameButton.className = "new-game";
     newGameButton.innerHTML = "START NEW GAME";
     document.body.children[0].appendChild(newGameButton);
+    
+    $(newGameButton).click(function() {
+        location.reload();
+    });
 };
 
 /***
@@ -122,6 +131,15 @@ Matrix.prototype.generateRandomCell = function() {
 };
 
 /***
+ * Checki that the cell which must be painted or cleared doesn't contains the following color and food color
+ * @param partForCheck
+ * @returns {boolean}
+ */
+Matrix.prototype.checkThereIsNotColor = function(cellNumber, partForCheck) {
+    return (this.matrix.children[cellNumber].style.backgroundColor != partForCheck);
+}
+
+/***
  * Add color to cell
  * @param cellNumber
  */
@@ -143,26 +161,26 @@ Matrix.prototype.colouredCell = function(cellNumber, bodyRole, direction) {
                     image = headDown;
                     break;
             }
-            if(this.matrix.children[cellNumber].style.backgroundColor != "gray"){
-                this.matrix.children[cellNumber].style.backgroundColor = "gray";
+            if(this.checkThereIsNotColor(cellNumber, headColor)) {
+                this.matrix.children[cellNumber].style.backgroundColor = headColor;
             }
             break;
 
         case "part":
-            if(this.matrix.children[cellNumber].style.backgroundColor != "#006600"){
-                this.matrix.children[cellNumber].style.backgroundColor = "#006600";
+            if(this.checkThereIsNotColor(cellNumber, bodyPartColor)) {
+                this.matrix.children[cellNumber].style.backgroundColor = bodyPartColor;
             }
             break;
 
         case "tail":
-            if(this.matrix.children[cellNumber].style.backgroundColor != "#00e600"){
-                this.matrix.children[cellNumber].style.backgroundColor = "#00e600";
+            if(this.checkThereIsNotColor(cellNumber, tailColor)){
+                this.matrix.children[cellNumber].style.backgroundColor = tailColor;
             }
             break;
 
         case "food":
-            if(this.matrix.children[cellNumber].style.backgroundColor != "#cc0000"){
-                this.matrix.children[cellNumber].style.backgroundColor = "#cc0000";
+            if(this.matrix.children[cellNumber].style.backgroundColor != foodColor){
+                this.matrix.children[cellNumber].style.backgroundColor = foodColor;
             }
             break;
     }
@@ -173,8 +191,8 @@ Matrix.prototype.colouredCell = function(cellNumber, bodyRole, direction) {
  * @param cellNumber int
  */
 Matrix.prototype.uncolouredCell = function(cellNumber) {
-    if(this.matrix.children[cellNumber].style.backgroundColor != color){
-        this.matrix.children[cellNumber].style.backgroundColor = color;
+    if(this.checkThereIsNotColor(cellNumber, tailColor)){
+        this.matrix.children[cellNumber].style.backgroundColor = backgroundColor;
     }
 };
 
@@ -282,7 +300,7 @@ Matrix.prototype.movingLoop = function(snake, food) {
         food.remove();
         this.createBodyPart(snake, i, snake.length, snake[0].direction);
 
-        setTimeout(this.createFood(food), 2000);
+        setTimeout(this.createFood(food, snake), 2000);
     }
 }
 
@@ -309,9 +327,7 @@ Matrix.prototype.setPositionForNewBodyPart = function(bodyPart, direction) {
             yCoordinate = bodyPart.yCoordinate - 1;
             break;
     }
-
     return coordinates = [xCoordinate, yCoordinate];
-    // console.log(coordinates);
 };
 
 /***
@@ -344,37 +360,50 @@ Matrix.prototype.createBodyPart = function(snake, bodyPartNumber, bodyAmount, di
     }
 }
 
-Matrix.prototype.createFood = function(food) {
+Matrix.prototype.createFood = function(food, snake) {
     food.position = this.generateRandomCell()
+    for (var i = 0; i < snake.length; i++) {
+        if (food.position == snake[i].position) {
+            food.position = this.generateRandomCell()
+        }
+    }
+
     this.colouredCell(food.getPosition(), "food", UP);
 }
 
 window.onload = function() {
+    $(".greetings input").click(function(e){
+        var name = $(e.target).attr('name');
+        var namesAmount = document.getElementsByName(name);
 
+        for(var i = 0; i < namesAmount.length; i++) {
+            $(namesAmount[i]).removeClass('active');
+        }
+        var className = $(this).attr('class');
+        $('.greetings label.' + className).addClass("active");
+    });
     $('.start, .new-game').on('click', function(){
 
         $("#matrix").addClass('active');
 
-        var colsAmount = (Number)(document.querySelector('input[name="colsAmount"]:checked').value);
-        var rowsAmount = (Number)(document.querySelector('input[name="rowsAmount"]:checked').value);
+        var gridAmount = (Number)(document.querySelector('input[name="gridAmount"]:checked').value);
         var gameSpeed = (Number)(document.querySelector('input[name="gameLevel"]:checked').value);
         $('.greetings').remove();
 
+        var myMatrix = new Matrix(gridAmount, gridAmount);
+        document.getElementById('matrix').style.width = gridAmount * 20 + "px";
+        document.getElementById('matrix').style.height = gridAmount * 20 + "px";
 
-        var myMatrix = new Matrix(colsAmount, rowsAmount);
-        document.getElementById('matrix').style.width = colsAmount * 20 + "px";
-        document.getElementById('matrix').style.height = rowsAmount * 20 + "px";
-
-        var head = new BodyPart(colsAmount/2, rowsAmount/2, "head", myMatrix.cols);
+        var head = new BodyPart(gridAmount/2, gridAmount/2, "head", myMatrix.cols);
 
         // Snake appearance
         var snake = new Array();
         snake[0] = head;
-        myMatrix.colouredCell(snake[0].position);
+        myMatrix.colouredCell(snake[0].position, snake[0].role, snake[0].direction);
 
         // Food appearance
         var food = new Food();
-        myMatrix.createFood(food);
+        myMatrix.createFood(food, snake);
 
         myMatrix.timerId = setInterval(function() {
             myMatrix.movingLoop(snake, food)
