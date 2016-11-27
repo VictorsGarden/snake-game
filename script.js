@@ -8,6 +8,15 @@ const UP = 38;
 const RIGHT = 39;
 const DOWN = 40;
 
+// Establish cell's color
+color = "silver";
+
+// Establish images for snake parts
+headUp = 'resources/snake-up-right.png';
+headDown = 'resources/snake-down-left.png';
+headRight = 'resources/snake-right.png';
+headLeft = 'resources/snake-left.png';
+
 /***
  * create field of DOM elements
  * @param rows int
@@ -74,10 +83,13 @@ Matrix.prototype.gameOver = function(cause) {
     var snakeImage = document.createElement("img");
     snakeWrapper.className = "snake-wrapper";
     snakeImage.className = "snake-image";
-    snakeImage.setAttribute("src", "img/" + cause + ".jpg");
+    snakeImage.setAttribute("src", "resources/" + cause + ".jpg");
     document.body.appendChild(snakeWrapper);
     document.body.children[0].appendChild(snakeImage);
-    alert("GAME OVER");
+    var newGameButton = document.createElement('button');
+    newGameButton.className = "new-game";
+    newGameButton.innerHTML = "START NEW GAME";
+    document.body.children[0].appendChild(newGameButton);
 };
 
 /***
@@ -113,11 +125,46 @@ Matrix.prototype.generateRandomCell = function() {
  * Add color to cell
  * @param cellNumber
  */
-Matrix.prototype.colouredCell = function(cellNumber, colour) {
-    if (colour == undefined)
-        colour = "black";
-    if(this.matrix.children[cellNumber].style.backgroundColor != colour){
-        this.matrix.children[cellNumber].style.backgroundColor = colour;
+Matrix.prototype.colouredCell = function(cellNumber, bodyRole, direction) {
+    switch (bodyRole) {
+        case "head":
+            var image = "head";
+            switch (direction) {
+                case LEFT:
+                    image = headLeft;
+                    break;
+                case UP:
+                    image = headUp;
+                    break;
+                case RIGHT:
+                    image = headRight;
+                    break;
+                case DOWN:
+                    image = headDown;
+                    break;
+            }
+            if(this.matrix.children[cellNumber].style.backgroundColor != "gray"){
+                this.matrix.children[cellNumber].style.backgroundColor = "gray";
+            }
+            break;
+
+        case "part":
+            if(this.matrix.children[cellNumber].style.backgroundColor != "#006600"){
+                this.matrix.children[cellNumber].style.backgroundColor = "#006600";
+            }
+            break;
+
+        case "tail":
+            if(this.matrix.children[cellNumber].style.backgroundColor != "#00e600"){
+                this.matrix.children[cellNumber].style.backgroundColor = "#00e600";
+            }
+            break;
+
+        case "food":
+            if(this.matrix.children[cellNumber].style.backgroundColor != "#cc0000"){
+                this.matrix.children[cellNumber].style.backgroundColor = "#cc0000";
+            }
+            break;
     }
 };
 
@@ -126,8 +173,8 @@ Matrix.prototype.colouredCell = function(cellNumber, colour) {
  * @param cellNumber int
  */
 Matrix.prototype.uncolouredCell = function(cellNumber) {
-    if(this.matrix.children[cellNumber].style.backgroundColor != "white"){
-        this.matrix.children[cellNumber].style.backgroundColor = "white";
+    if(this.matrix.children[cellNumber].style.backgroundColor != color){
+        this.matrix.children[cellNumber].style.backgroundColor = color;
     }
 };
 
@@ -139,13 +186,12 @@ Matrix.prototype.uncolouredCell = function(cellNumber) {
  * @param yChange int
  * @returns {position int}
  */
-Matrix.prototype.changePosition = function(currentCell, xChange, yChange) {
+Matrix.prototype.changePosition = function(currentCell, xChange, yChange, bodyRole, direction) {
     this.uncolouredCell(currentCell.position);
     currentCell.xCoordinate += xChange;
     currentCell.yCoordinate += yChange;
     currentCell.position = calculateCellPosition(currentCell.xCoordinate, currentCell.yCoordinate, this.cols);
-    this.colouredCell(currentCell.position);
-    // console.log(currentCell.position);
+    this.colouredCell(currentCell.position, bodyRole, direction);
     return currentCell.position;
 };
 
@@ -154,35 +200,35 @@ Matrix.prototype.changePosition = function(currentCell, xChange, yChange) {
  * @param bodyPart Obj
  * @param direction int
  */
-Matrix.prototype.moveIteration = function(bodyPart, direction) {
+Matrix.prototype.moveIteration = function(bodyPart, direction, bodyRole) {
     switch(direction) {
         case LEFT:
             if ((bodyPart.position == 0) || (bodyPart.position % this.cols == 0)) {
                 this.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, -1, 0);
+            bodyPart.position = this.changePosition(bodyPart, -1, 0, bodyRole, direction);
             break;
         case UP:
             if (bodyPart.position - this.cols < 0) {
                 this.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, 0, -1);
+            bodyPart.position = this.changePosition(bodyPart, 0, -1, bodyRole, direction);
             break;
         case RIGHT:
             if ((bodyPart.position + 1 > this.cellsAmount) || (bodyPart.position + 1) % this.cols == 0) {
                 this.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, 1, 0);
+            bodyPart.position = this.changePosition(bodyPart, 1, 0, bodyRole, direction);
             break;
         case DOWN:
             if (bodyPart.position + this.cols >= this.cellsAmount) {
                 this.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, 0, 1);
+            bodyPart.position = this.changePosition(bodyPart, 0, 1, bodyRole, direction);
             break;
     }
 }
@@ -198,14 +244,14 @@ Matrix.prototype.move = function(snake, bodyPart, direction) {
 
     if (bodyPart == 0) {
         snake[bodyPart].direction = direction;
-        this.moveIteration(snake[bodyPart], direction);
+        this.moveIteration(snake[bodyPart], direction, snake[bodyPart].role);
         for (var i = 1; i < snake.length; i++) {
             if (snake[bodyPart].position == snake[i].position) {
                 this.gameOver("uroboros");
             }
         }
     } else {
-        this.moveIteration(snake[bodyPart], snake[bodyPart].direction);
+        this.moveIteration(snake[bodyPart], snake[bodyPart].direction, snake[bodyPart].role);
 
         if(snake[bodyPart].xCoordinate == snake[bodyPart - 1].xCoordinate) {
 
@@ -230,7 +276,6 @@ Matrix.prototype.move = function(snake, bodyPart, direction) {
 Matrix.prototype.movingLoop = function(snake, food) {
     for (var i = 0; i < snake.length; i++) {
         this.move(snake, i, snake[i].direction);
-
     }
 
     if (snake[0].position == food.getPosition()) {
@@ -281,7 +326,7 @@ Matrix.prototype.createBodyPart = function(snake, bodyPartNumber, bodyAmount, di
         var tail = new BodyPart(tailCoordinates[0], tailCoordinates[1], "tail", this.cols);
         snake[1] = tail;
         snake[1].direction = snake[0].direction;
-        this.colouredCell(tail.position);
+        this.colouredCell(tail.position, tail.role, tail.direction);
 
     } else {
         var oldTailBodyPart = bodyAmount - 1;
@@ -291,51 +336,62 @@ Matrix.prototype.createBodyPart = function(snake, bodyPartNumber, bodyAmount, di
         );
 
         snake[oldTailBodyPart].role = "part";
+        this.colouredCell(snake[oldTailBodyPart].position, snake[oldTailBodyPart].role, snake[oldTailBodyPart].direction);
         var newTail = new BodyPart(newTailPosition[0], newTailPosition[1], "tail", this.cols);
         newTail.direction = snake[oldTailBodyPart].direction;
         snake[oldTailBodyPart + 1] = newTail;
-        this.colouredCell(newTail.position);
+        this.colouredCell(newTail.position, newTail.role, newTail.direction);
     }
 }
 
 Matrix.prototype.createFood = function(food) {
     food.position = this.generateRandomCell()
-    this.colouredCell(food.getPosition(), "green");
+    this.colouredCell(food.getPosition(), "food", UP);
 }
 
 window.onload = function() {
-    var myMatrix = new Matrix(20, 20);
 
-    var head = new BodyPart(10, 10, "head", myMatrix.cols);
+    $('.start, .new-game').on('click', function(){
 
-    //Snake
-    var snake = new Array();
-    snake[0] = head;
+        $("#matrix").addClass('active');
 
-    myMatrix.colouredCell(snake[0].position);
+        var colsAmount = (Number)(document.querySelector('input[name="colsAmount"]:checked').value);
+        var rowsAmount = (Number)(document.querySelector('input[name="rowsAmount"]:checked').value);
+        var gameSpeed = (Number)(document.querySelector('input[name="gameLevel"]:checked').value);
+        $('.greetings').remove();
 
-    var food = new Food();
 
-    //food appearance
-    myMatrix.createFood(food);
+        var myMatrix = new Matrix(colsAmount, rowsAmount);
+        document.getElementById('matrix').style.width = colsAmount * 20 + "px";
+        document.getElementById('matrix').style.height = rowsAmount * 20 + "px";
 
-    var gameSpeed = 400;
+        var head = new BodyPart(colsAmount/2, rowsAmount/2, "head", myMatrix.cols);
 
-    myMatrix.timerId = setInterval(function() {
-        myMatrix.movingLoop(snake, food)
-    }, gameSpeed);
+        // Snake appearance
+        var snake = new Array();
+        snake[0] = head;
+        myMatrix.colouredCell(snake[0].position);
 
-    //Button click handler
-    document.onkeydown = function(event) {
-        if((event.keyCode >= 37) && (event.keyCode <= 40)) {
-            var keyCode = event.keyCode;
-            if (!(snake[0].direction == UP && keyCode == DOWN)
-                && !(snake[0].direction == DOWN && keyCode == UP)
-                && !(snake[0].direction == LEFT && keyCode == RIGHT)
-                && !(snake[0].direction == RIGHT && keyCode == LEFT)) {
+        // Food appearance
+        var food = new Food();
+        myMatrix.createFood(food);
 
-                snake[0].direction = keyCode;
+        myMatrix.timerId = setInterval(function() {
+            myMatrix.movingLoop(snake, food)
+        }, gameSpeed);
+
+        //Button click handler
+        document.onkeydown = function(event) {
+            if((event.keyCode >= 37) && (event.keyCode <= 40)) {
+                var keyCode = event.keyCode;
+                if (!(snake[0].direction == UP && keyCode == DOWN)
+                    && !(snake[0].direction == DOWN && keyCode == UP)
+                    && !(snake[0].direction == LEFT && keyCode == RIGHT)
+                    && !(snake[0].direction == RIGHT && keyCode == LEFT)) {
+
+                    snake[0].direction = keyCode;
+                }
             }
         }
-    }
+    });
 };

@@ -1,12 +1,12 @@
-algorythm, which I have created and using for this game
-if you'll use it, give me one million dollars ;P
+The algorithm, which I have formulated and using for this game
+if you'll use it, please give me one million dollars ;P
 
 LOGIC:
 0) Cell have:
 			- coordinates (x,y),
 			- direction;
 1) Calculation cell's position;
-2) Moving;
+2) Moving (MAIN);
 3) Eating;
 4) Growing.
 
@@ -32,26 +32,50 @@ LOGIC:
 2. Moving
 	check whether the coordinates for next point for HEAD and coordinates of any body part are same
 		if yes "GAME OVER";
-	according to what button is enter, change cell's coordinates
+	for HEAD according to what button is enter, change cell's coordinates
 		<- reduce col value
 		-> increase col value
 		^ reduce row value
 		v increase row value
+		
+	for BODY
+		(!!! MOST IMPORTANT LOGIC !!!)
+		if X-Coordinate of current body part and X-Coordinate of previous body part are same
+			then check
+			if previous body part Y-Coordinate are bigger then Y-Coordinate of current body-part
+				then current body-part direction is DOWN
+			if previous body part Y-Coordinate are smaller then Y-Coordinate of current body-part
+				then current body-part direction is UP
+				
+		if Y-Coordinate of current body part and Y-Coordinate of previous body part are same
+			then check
+			if previous body part X-Coordinate are bigger then X-Coordinate of current body-part
+				then current body-part direction is RIGHT
+			if previous body part X-Coordinate are smaller then X-Coordinate of current body-part
+				then current body-part direction is LEFT
 	
 3. EATING
 	if head and food have same coordinates
 		destroy food cell
 		began to GROW
 
-4. GROWING
-	checking for tail's position and direction
-		if tail looks up
+4.1 GROWING
+	Check whether the body is only one element
+	if yes
+		CREATE NEW BODY PART as tail right after first body part
+	if not
+		CREATE NEW BODY PART right after last
+		old tail becomes body part
+		new body part becomes tail
+
+4.2 CREATE NEW BODY PART
+	checking for last element's position and direction
+		if it looks up
 			create body part one row below
-		if tail looks down
+		if it looks down
 			create body part one row above
-		if tail looks left
+		if it looks left
 			create body part one col left
-		if tail looks right
+		if it looks right
 			create body part one col right
-	this body part became a tail
 		

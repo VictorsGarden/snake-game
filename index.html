@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="//https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.js"></script>
     <script language="javascript" src="script.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css" media="screen">
     <title>snake game</title>
@@ -10,6 +10,49 @@
 <body>
     <div id="matrix">
 
+    </div>
+
+    <div class="greetings">
+        <p class="game-name">SNAKE-GAME</p>
+        <div class="game-block">
+            <span class="title-text">CHOOSE COLUMNS AMOUNT</span>
+            <label>10</label>
+            <input id="colsTen" type="radio" name="colsAmount" value="10">
+
+            <label>20</label>
+            <input id="colsTwenty" type="radio" name="colsAmount" value="20">
+
+            <label>30</label>
+            <input id="colsThirty" type="radio" name="colsAmount" value="30">
+        </div>
+
+        <div class="game-block">
+            <span class="title-text">CHOOSE ROWS AMOUNT</span>
+            <label>10</label>
+            <input type="radio" name="rowsAmount" value="10">
+
+            <label>20</label>
+            <input type="radio" name="rowsAmount" value="20">
+
+            <label>30</label>
+            <input type="radio" name="rowsAmount" value="30">
+        </div>
+
+        <div class="game-block">
+            <span class="title-text">CHOOSE GAME LEVEL</span>
+            <label>NEWBIE</label>
+            <input type="radio" name="gameLevel" value="400">
+
+            <label>MASTER</label>
+            <input type="radio" name="gameLevel" value="300"><br/>
+
+            <label>PRO</label>
+            <input type="radio" name="gameLevel" value="200">
+
+            <label>VETERAN</label>
+            <input type="radio" name="gameLevel" value="100">
+        </div>
+        <button class="start">START</button>
     </div>
 </body>
 </html>

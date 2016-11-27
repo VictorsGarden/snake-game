@@ -1,17 +1,32 @@
+@font-face {
+    font-family: Shady-Lane;
+    src: url(resources/Shady-Lane.ttf);
+}
 
-#matrix {
-    width: 400px;
-    height: 400px;
-    margin: 50px 0 0 50px;
+input {
+    width: 20px;
+    height: 20px;
+}
+
+html {
+    background-color: indigo;
+}
+#matrix.active {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
 
     border-left: 1px solid black;
     border-top: 1px solid black;
 }
 
-#matrix .cell {
+#matrix.active .cell {
     display: inline-block;
     float: left;
-    background-color: white;
+    background-color: silver;
 
     width: 19px;
     height: 19px;
@@ -24,6 +39,7 @@
     position: relative;
     margin: auto;
 }
+
 .snake-wrapper .snake-image{
     position: absolute;
     margin: 0 auto;
@@ -31,4 +47,50 @@
     bottom: 0;
     right: 0;
     left: 0;
+}
+
+.greetings {
+    position: relative;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    width: 400px;
+    height: 300px;
+    background-color: indigo;
+}
+
+.game-name {
+    color: #2eb82e;
+    font-size: 55px;
+    font-family: Shady-Lane;
+    letter-spacing: 14px;
+    margin: 0 0 20px 0;
+}
+
+.greetings .game-block {
+    color: #c1bfea;
+    font-size: 25px;
+    padding-bottom: 20px;
+    font-family: Shady-Lane;
+}
+
+.title-text {
+    display: block;
+    font-size: 30px;
+    color: #f02f17;
+    margin-bottom: 15px;
+}
+
+.start {
+    cursor: pointer;
+    border: none;
+    width: 150px;
+    height: auto;
+    font-size: 50px;
+    background-color: transparent;
+    color: #2eb82e;
+    font-family: Shady-Lane;
 }
