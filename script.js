@@ -67,14 +67,14 @@ function BodyPart(xCoordinate, yCoordinate, role, colsAmount) {
 /***
  * Show image, when game is over
  */
-Matrix.prototype.gameOver = function() {
+Matrix.prototype.gameOver = function(cause) {
     clearInterval(this.timerId);
     document.body.removeChild(document.body.children[0]);
     var snakeWrapper = document.createElement("div");
     var snakeImage = document.createElement("img");
     snakeWrapper.className = "snake-wrapper";
     snakeImage.className = "snake-image";
-    snakeImage.setAttribute("src", "img/dead-snake.jpg");
+    snakeImage.setAttribute("src", "img/" + cause + ".jpg");
     document.body.appendChild(snakeWrapper);
     document.body.children[0].appendChild(snakeImage);
     alert("GAME OVER");
@@ -158,28 +158,28 @@ Matrix.prototype.moveIteration = function(bodyPart, direction) {
     switch(direction) {
         case LEFT:
             if ((bodyPart.position == 0) || (bodyPart.position % this.cols == 0)) {
-                this.gameOver();
+                this.gameOver("crash");
                 break;
             }
             bodyPart.position = this.changePosition(bodyPart, -1, 0);
             break;
         case UP:
             if (bodyPart.position - this.cols < 0) {
-                this.gameOver();
+                this.gameOver("crash");
                 break;
             }
             bodyPart.position = this.changePosition(bodyPart, 0, -1);
             break;
         case RIGHT:
             if ((bodyPart.position + 1 > this.cellsAmount) || (bodyPart.position + 1) % this.cols == 0) {
-                this.gameOver();
+                this.gameOver("crash");
                 break;
             }
             bodyPart.position = this.changePosition(bodyPart, 1, 0);
             break;
         case DOWN:
             if (bodyPart.position + this.cols >= this.cellsAmount) {
-                this.gameOver();
+                this.gameOver("crash");
                 break;
             }
             bodyPart.position = this.changePosition(bodyPart, 0, 1);
@@ -199,6 +199,11 @@ Matrix.prototype.move = function(snake, bodyPart, direction) {
     if (bodyPart == 0) {
         snake[bodyPart].direction = direction;
         this.moveIteration(snake[bodyPart], direction);
+        for (var i = 1; i < snake.length; i++) {
+            if (snake[bodyPart].position == snake[i].position) {
+                this.gameOver("uroboros");
+            }
+        }
     } else {
         this.moveIteration(snake[bodyPart], snake[bodyPart].direction);
 
@@ -225,6 +230,7 @@ Matrix.prototype.move = function(snake, bodyPart, direction) {
 Matrix.prototype.movingLoop = function(snake, food) {
     for (var i = 0; i < snake.length; i++) {
         this.move(snake, i, snake[i].direction);
+
     }
 
     if (snake[0].position == food.getPosition()) {
@@ -290,8 +296,6 @@ Matrix.prototype.createBodyPart = function(snake, bodyPartNumber, bodyAmount, di
         snake[oldTailBodyPart + 1] = newTail;
         this.colouredCell(newTail.position);
     }
-
-    // console.log(snake);
 }
 
 Matrix.prototype.createFood = function(food) {
