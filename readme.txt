@@ -42,16 +42,16 @@ LOGIC:
 		(!!! MOST IMPORTANT LOGIC !!!)
 		if X-Coordinate of current body part and X-Coordinate of previous body part are same
 			then check
-			if previous body part Y-Coordinate are bigger then Y-Coordinate of current body-part
+			if previous body part's Y-Coordinate are bigger then current
 				then current body-part direction is DOWN
-			if previous body part Y-Coordinate are smaller then Y-Coordinate of current body-part
+			if previous body part's Y-Coordinate are smaller then current
 				then current body-part direction is UP
 				
 		if Y-Coordinate of current body part and Y-Coordinate of previous body part are same
 			then check
-			if previous body part X-Coordinate are bigger then X-Coordinate of current body-part
+			if previous body part's X-Coordinate are bigger then current
 				then current body-part direction is RIGHT
-			if previous body part X-Coordinate are smaller then X-Coordinate of current body-part
+			if previous body part's X-Coordinate are smaller then current
 				then current body-part direction is LEFT
 	
 3. EATING
