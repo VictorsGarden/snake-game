@@ -2,11 +2,6 @@
 // give user possibility to set amount of cols and rows,
 // which implies usage of Matrix's essence with it's own number of cols and rows
 
-//Functions:
-// matrixCreate: create field of DOM elements
-// getCellElement: Get cell element from DOM
-// colouredRandomCell
-
 // Set up constants for key-codes
 const LEFT = 37;
 const UP = 38;
@@ -31,19 +26,35 @@ function Matrix(cols, rows) {
     }
 }
 
+/***
+ * Food class
+ */
 function Food() {
     this.position = 0;
 }
 
+/***
+ * getter for food's position
+ * @returns {position int}
+ */
 Food.prototype.getPosition = function() {
     return this.position;
 };
 
+/***
+ * We cannot just kill the object in JS, therefore we hide it
+ */
 Food.prototype.remove = function() {
     this.position = -1;
 };
 
-
+/***
+ * BodyPart Class
+ * @param xCoordinate int
+ * @param yCoordinate int
+ * @param role string
+ * @param colsAmount int
+ */
 function BodyPart(xCoordinate, yCoordinate, role, colsAmount) {
     this.xCoordinate = xCoordinate;
     this.yCoordinate = yCoordinate;
@@ -78,13 +89,18 @@ Matrix.prototype.generateRandomCoordinate = function(diapason) {
 
 /***
  * Calculating position of cell using it's coordinates
+ * @param xCoordinate int
+ * @param yCoordinate int
+ * @param colsAmount
+ * @returns {int}
  */
 calculateCellPosition = function(xCoordinate, yCoordinate, colsAmount) {
     return (yCoordinate - 1) * colsAmount + xCoordinate;
 };
 
 /***
- * Add color to random cell
+ * Generate cell with random X and Y coordinates
+ * @returns {int}
  */
 Matrix.prototype.generateRandomCell = function() {
     var randomXCoordinate = this.generateRandomCoordinate(this.cols);
@@ -105,6 +121,7 @@ Matrix.prototype.colouredCell = function(cellNumber, colour) {
 };
 
 /***
+ * Clear cell's colour to default
  * @param cellNumber int
  */
 Matrix.prototype.uncolouredCell = function(cellNumber) {
@@ -114,34 +131,11 @@ Matrix.prototype.uncolouredCell = function(cellNumber) {
 };
 
 /***
- * Calculating cell's coordinates, using position number and x/y values of matrix
- */
-//TODO fix algorythm
-Matrix.prototype.getCoordinatesFromPosition = function(position) {
-    var xCoordinate = 0;
-    var yCoordinate = 0;
-
-    if((position % this.cols) === 0) {
-        xCoordinate = this.cols;
-        yCoordinate = position / this.cols;
-    } else if ((position % this.cols) > 0) {
-
-        if (position < this.cols) {
-            xCoordinate = position % this.cols;
-            yCoordinate = 0;
-        } else {
-            xCoordinate = position % this.cols;
-            yCoordinate = Math.ceil(position / this.cols);
-        }
-    }
-    yCoordinate = position % this.cols;
-    var coordinates = [xCoordinate, yCoordinate];
-    return coordinates;
-};
-
-/***
+ * The very basic iteration for change colour to old
+ * and give it to the new cell's position
  * @param currentCell int
- * @param directionNumber int
+ * @param xChange int
+ * @param yChange int
  * @returns {position int}
  */
 Matrix.prototype.changePosition = function(currentCell, xChange, yChange) {
@@ -150,16 +144,16 @@ Matrix.prototype.changePosition = function(currentCell, xChange, yChange) {
     currentCell.yCoordinate += yChange;
     currentCell.position = calculateCellPosition(currentCell.xCoordinate, currentCell.yCoordinate, this.cols);
     this.colouredCell(currentCell.position);
+    console.log(currentCell.position);
     return currentCell.position;
 };
 
 /***
- * Remove color from old position, change cell number according to key number and add color to the new
- * @param int movingCell
- * @returns int movingCell
+ * One basic iteration for change poisition according new direction
+ * @param bodyPart Obj
+ * @param direction int
  */
-Matrix.prototype.move = function(bodyPart, direction) {
-
+Matrix.prototype.moveIteration = function(bodyPart, direction) {
     switch(direction) {
         case LEFT:
             if ((bodyPart.position == 0) || (bodyPart.position % this.cols == 0)) {
@@ -167,7 +161,7 @@ Matrix.prototype.move = function(bodyPart, direction) {
                 break;
             }
             bodyPart.position = this.changePosition(bodyPart, -1, 0);
-			break;
+            break;
         case UP:
             if (bodyPart.position - this.cols < 0) {
                 this.gameOver();
@@ -181,14 +175,49 @@ Matrix.prototype.move = function(bodyPart, direction) {
                 break;
             }
             bodyPart.position = this.changePosition(bodyPart, 1, 0);
-			break;
+            break;
         case DOWN:
             if (bodyPart.position + this.cols >= this.cellsAmount) {
                 this.gameOver();
                 break;
             }
             bodyPart.position = this.changePosition(bodyPart, 0, 1);
-			break;
+            break;
+    }
+}
+
+/***
+ * The main function of this entire game
+ * which do smart alhorythm to find new way for
+ * @param snake array
+ * @param bodyPart Object
+ * @param direction int
+ */
+Matrix.prototype.move = function(snake, bodyPart, direction) {
+
+    if (bodyPart == 0) {
+        snake[bodyPart].direction = direction;
+        this.moveIteration(snake[bodyPart], direction);
+    } else {
+        this.moveIteration(snake[bodyPart], snake[bodyPart].direction);
+
+        if(snake[bodyPart].xCoordinate == snake[bodyPart - 1].xCoordinate) {
+
+            if(snake[bodyPart].yCoordinate < snake[bodyPart - 1].yCoordinate) {
+                snake[bodyPart].direction = DOWN;
+
+            } else if(snake[bodyPart].yCoordinate > snake[bodyPart - 1].yCoordinate) {
+                snake[bodyPart].direction = UP;
+            }
+        } else if(snake[bodyPart].yCoordinate == snake[bodyPart - 1].yCoordinate) {
+
+            if(snake[bodyPart].xCoordinate < snake[bodyPart - 1].xCoordinate) {
+                snake[bodyPart].direction = RIGHT;
+
+            } else if(snake[bodyPart].xCoordinate > snake[bodyPart - 1].xCoordinate) {
+                snake[bodyPart].direction = LEFT;
+            }
+        }
     }
 };
 
@@ -225,18 +254,20 @@ Matrix.prototype.createBodyPart = function(snake, bodyPartNumber, bodyAmount, di
         var tailCoordinates = this.setPositionForNewBodyPart(snake[0], direction);
         var tail = new BodyPart(tailCoordinates[0], tailCoordinates[1], "tail", this.cols);
         snake[1] = tail;
+        snake[1].direction = snake[0].direction;
         this.colouredCell(tail.position);
 
     } else {
-        var oldTailPosition = bodyAmount - 1;
+        var oldTailBodyPart = bodyAmount - 1;
         var newTailPosition = this.setPositionForNewBodyPart(
-            snake[oldTailPosition],
-            snake[oldTailPosition].direction
+            snake[oldTailBodyPart],
+            snake[oldTailBodyPart].direction
         );
 
-        snake[oldTailPosition].role = "part";
+        snake[oldTailBodyPart].role = "part";
         var newTail = new BodyPart(newTailPosition[0], newTailPosition[1], "tail", this.cols);
-        snake[oldTailPosition + 1] = newTail;
+        newTail.direction = snake[oldTailBodyPart].direction;
+        snake[oldTailBodyPart + 1] = newTail;
         this.colouredCell(newTail.position);
     }
 
@@ -272,12 +303,11 @@ window.onload = function() {
             var keyCode = event.keyCode;
 
             for(var i = 0; i < snake.length; i++) {
-                if(snake[i].role == "head") {
-                    snake[i].direction = keyCode;
-                    myMatrix.move(snake[i], keyCode);
-                } else {
-                    myMatrix.move(snake[i], keyCode);
-                    snake.direction = keyCode;
+                if(!(snake[0].direction == UP && keyCode == DOWN)
+                    && !(snake[0].direction == DOWN && keyCode == UP)
+                    && !(snake[0].direction == LEFT && keyCode == RIGHT)
+                    && !(snake[0].direction == RIGHT && keyCode == LEFT)) {
+                    myMatrix.move(snake, i, keyCode);
                 }
             }
 
@@ -292,5 +322,4 @@ window.onload = function() {
             }
         }
     }
-
 };
