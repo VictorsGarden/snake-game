@@ -8,13 +8,6 @@ const UP = 38;
 const RIGHT = 39;
 const DOWN = 40;
 
-// Establish images for snake parts
-//TODO add images-logic
-headUp = 'url("resources/snake-up-right.png")';
-headDown = 'url(resources/snake-down-left.png)';
-headRight = 'url(resources/snake-right.png)';
-headLeft = 'url(resources/snake-left.png)';
-
 // Establish colors for snake's part
 backgroundColor = "silver";
 headColor = "#1FFF80";
@@ -23,7 +16,7 @@ tailColor = "#1D6122";
 foodColor = "#cc0000";
 
 /***
- * create field of DOM elements
+ * Class Matrix, which create field of DOM elements
  * @param rows int
  * @param cols int
  */
@@ -72,14 +65,14 @@ Food.prototype.remove = function() {
 function BodyPart(xCoordinate, yCoordinate, role, colsAmount) {
     this.xCoordinate = xCoordinate;
     this.yCoordinate = yCoordinate;
-
     this.position = calculateCellPosition(xCoordinate, yCoordinate, colsAmount);
     this.direction = UP;
     this.role = role;
 }
 
 /***
- * Show image, when game is over
+ * Overing a game by two different causes - smashing into the wall and eat itself - uroboros =)
+ * @param cause string
  */
 Matrix.prototype.gameOver = function(cause) {
     clearInterval(this.timerId);
@@ -107,7 +100,7 @@ Matrix.prototype.gameOver = function(cause) {
  */
 Matrix.prototype.generateRandomCoordinate = function(diapason) {
     return Math.floor(Math.random() * diapason + 1);
-}
+};
 
 /***
  * Calculating position of cell using it's coordinates
@@ -131,36 +124,22 @@ Matrix.prototype.generateRandomCell = function() {
 };
 
 /***
- * Checki that the cell which must be painted or cleared doesn't contains the following color and food color
+ * Check whether the cell, which must be painted or cleared doesn't contains the following color
  * @param partForCheck
  * @returns {boolean}
  */
 Matrix.prototype.checkThereIsNotColor = function(cellNumber, partForCheck) {
     return (this.matrix.children[cellNumber].style.backgroundColor != partForCheck);
-}
+};
 
 /***
- * Add color to cell
- * @param cellNumber
+ * Coloured cell according to it's role for game
+ * @param cellNumber int
+ * @param bodyRole string
  */
-Matrix.prototype.colouredCell = function(cellNumber, bodyRole, direction) {
+Matrix.prototype.colouredCell = function(cellNumber, bodyRole) {
     switch (bodyRole) {
         case "head":
-            var image = "head";
-            switch (direction) {
-                case LEFT:
-                    image = headLeft;
-                    break;
-                case UP:
-                    image = headUp;
-                    break;
-                case RIGHT:
-                    image = headRight;
-                    break;
-                case DOWN:
-                    image = headDown;
-                    break;
-            }
             if(this.checkThereIsNotColor(cellNumber, headColor)) {
                 this.matrix.children[cellNumber].style.backgroundColor = headColor;
             }
@@ -204,17 +183,17 @@ Matrix.prototype.uncolouredCell = function(cellNumber) {
  * @param yChange int
  * @returns {position int}
  */
-Matrix.prototype.changePosition = function(currentCell, xChange, yChange, bodyRole, direction) {
+Matrix.prototype.changePosition = function(currentCell, xChange, yChange, bodyRole) {
     this.uncolouredCell(currentCell.position);
     currentCell.xCoordinate += xChange;
     currentCell.yCoordinate += yChange;
     currentCell.position = calculateCellPosition(currentCell.xCoordinate, currentCell.yCoordinate, this.cols);
-    this.colouredCell(currentCell.position, bodyRole, direction);
+    this.colouredCell(currentCell.position, bodyRole);
     return currentCell.position;
 };
 
 /***
- * One basic iteration for change poisition according new direction
+ * One basic iteration for change position according to new direction
  * @param bodyPart Obj
  * @param direction int
  */
@@ -225,41 +204,43 @@ Matrix.prototype.moveIteration = function(bodyPart, direction, bodyRole) {
                 this.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, -1, 0, bodyRole, direction);
+            bodyPart.position = this.changePosition(bodyPart, -1, 0, bodyRole);
             break;
+
         case UP:
             if (bodyPart.position - this.cols < 0) {
                 this.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, 0, -1, bodyRole, direction);
+            bodyPart.position = this.changePosition(bodyPart, 0, -1, bodyRole);
             break;
+
         case RIGHT:
             if ((bodyPart.position + 1 > this.cellsAmount) || (bodyPart.position + 1) % this.cols == 0) {
                 this.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, 1, 0, bodyRole, direction);
+            bodyPart.position = this.changePosition(bodyPart, 1, 0, bodyRole);
             break;
+
         case DOWN:
             if (bodyPart.position + this.cols >= this.cellsAmount) {
                 this.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, 0, 1, bodyRole, direction);
+            bodyPart.position = this.changePosition(bodyPart, 0, 1, bodyRole);
             break;
     }
-}
+};
 
 /***
  * The main function of this entire game
- * which do smart alhorythm to find new way for
+ * which do smart algorithm to find new way for moving
  * @param snake array
  * @param bodyPart Object
  * @param direction int
  */
 Matrix.prototype.move = function(snake, bodyPart, direction) {
-
     if (bodyPart == 0) {
         snake[bodyPart].direction = direction;
         this.moveIteration(snake[bodyPart], direction, snake[bodyPart].role);
@@ -291,6 +272,11 @@ Matrix.prototype.move = function(snake, bodyPart, direction) {
     }
 };
 
+/***
+ * Moving entire snake's body
+ * @param snake Obj
+ * @param food Obj
+ */
 Matrix.prototype.movingLoop = function(snake, food) {
     for (var i = 0; i < snake.length; i++) {
         this.move(snake, i, snake[i].direction);
@@ -298,13 +284,14 @@ Matrix.prototype.movingLoop = function(snake, food) {
 
     if (snake[0].position == food.getPosition()) {
         food.remove();
-        this.createBodyPart(snake, i, snake.length, snake[0].direction);
+        this.createBodyPart(snake, snake.length, snake[0].direction);
 
         setTimeout(this.createFood(food, snake), 2000);
     }
-}
+};
 
 /***
+ * Helping-function which calculates where it ought create new body part from the last one
  * @param bodyPart Object
  * @param direction int
  * @returns {position int}
@@ -331,12 +318,12 @@ Matrix.prototype.setPositionForNewBodyPart = function(bodyPart, direction) {
 };
 
 /***
- * @param snake
- * @param bodyPartNumber
+ * Creating new body part after eating to became growing
+ * @param snake Obj
  * @param bodyAmount
  * @param direction
  */
-Matrix.prototype.createBodyPart = function(snake, bodyPartNumber, bodyAmount, direction) {
+Matrix.prototype.createBodyPart = function(snake, bodyAmount, direction) {
     if(bodyAmount == 1) {
         var tailCoordinates = this.setPositionForNewBodyPart(snake[0], direction);
         var tail = new BodyPart(tailCoordinates[0], tailCoordinates[1], "tail", this.cols);
@@ -358,19 +345,25 @@ Matrix.prototype.createBodyPart = function(snake, bodyPartNumber, bodyAmount, di
         snake[oldTailBodyPart + 1] = newTail;
         this.colouredCell(newTail.position, newTail.role, newTail.direction);
     }
-}
+};
 
+/***
+ * Creating random food cell within the matrix instance
+ * @param food Obj
+ * @param snake Obj
+ */
 Matrix.prototype.createFood = function(food, snake) {
-    food.position = this.generateRandomCell()
+    food.position = this.generateRandomCell();
+
     for (var i = 0; i < snake.length; i++) {
+
         if (food.position == snake[i].position) {
             i = 0;
             food.position = this.generateRandomCell();
         }
     }
-
     this.colouredCell(food.getPosition(), "food", UP);
-}
+};
 
 window.onload = function() {
     $(".greetings input").click(function(e){
