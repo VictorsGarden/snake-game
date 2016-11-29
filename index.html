@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.js"></script>
+    <script language="javascript" src="resources/jquery-3.1.0.min.js"></script>
     <script language="javascript" src="script.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="resources/style.css" media="screen">
     <title>snake game</title>
 </head>
 <body>
@@ -19,8 +19,8 @@
             <label class="cols-15" name="gridAmount">15</label>
             <input class="cols-15" type="radio" name="gridAmount" value="15">
 
-            <label class="cols-20" name="gridAmount">20</label>
-            <input class="cols-20" type="radio" name="gridAmount" value="20">
+            <label class="cols-20 active" name="gridAmount">20</label>
+            <input class="cols-20" checked="checked" type="radio" name="gridAmount" value="20">
 
             <label class="cols-25" name="gridAmount">25</label>
             <input class="cols-25" type="radio" name="gridAmount" value="25">
@@ -37,8 +37,8 @@
             <label class="master" name="gameLevel">MASTER</label>
             <input class="master" type="radio" name="gameLevel" value="140"><br/>
 
-            <label class="pro" name="gameLevel">PRO</label>
-            <input class="pro" type="radio" name="gameLevel" value="100"><br/>
+            <label class="pro active" name="gameLevel">PRO</label>
+            <input class="pro" type="radio" name="gameLevel" value="100" checked="checked"><br/>
 
             <label class="veteran" name="gameLevel">VETERAN</label>
             <input class="veteran" type="radio" name="gameLevel" value="60">
