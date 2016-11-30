@@ -41,14 +41,6 @@ function Food() {
 }
 
 /***
- * getter for food's position
- * @returns {position int}
- */
-Food.prototype.getPosition = function() {
-    return this.position;
-};
-
-/***
  * We cannot just kill the object in JS, therefore we hide it
  */
 Food.prototype.remove = function() {
@@ -237,7 +229,7 @@ Matrix.prototype.moveIteration = function(bodyPart, direction, bodyRole) {
  * The main function of this entire game
  * which do smart algorithm to find new way for moving
  * @param snake array
- * @param bodyPart Object
+ * @param bodyPart Obj
  * @param direction int
  */
 Matrix.prototype.move = function(snake, bodyPart, direction) {
@@ -282,23 +274,89 @@ Matrix.prototype.movingLoop = function(snake, food) {
         this.move(snake, i, snake[i].direction);
     }
 
-    if (snake[0].position == food.getPosition()) {
+    if (snake[0].position == food.position) {
         food.remove();
         this.createBodyPart(snake, snake.length, snake[0].direction);
-
         setTimeout(this.createFood(food, snake), 2000);
     }
 };
 
 /***
- * Helping-function which calculates where it ought create new body part from the last one
- * @param bodyPart Object
+ * Check in all cases whether the current tail not near borders and handle all situations if it is
+ * @param xCoordinate int
+ * @param yCoordinate int
+ * @param direction
+ * @returns {int[]}
+ */
+Matrix.prototype.checkTheBorders = function(xCoordinate, yCoordinate, direction) {
+    if(xCoordinate % this.cols == (this.cols - 1) || xCoordinate == 0 ||
+        yCoordinate == this.rows || yCoordinate == 1) {
+
+        if (xCoordinate % this.cols == (this.cols - 1)) {
+            if (yCoordinate == this.rows) {
+                if (direction == UP) {
+                    xCoordinate -= 1;
+                } else if (direction == LEFT) {
+                    yCoordinate -= 1;
+                }
+            } else if (yCoordinate == 1) {
+                if (direction == DOWN) {
+                    xCoordinate -= 1;
+                } else if (direction == LEFT) {
+                    yCoordinate += 1;
+                }
+            } else {
+                if (direction == LEFT) {
+                    yCoordinate += 1;
+                }
+            }
+        } else if (xCoordinate == 0) {
+            if (yCoordinate == this.rows) {
+                if (direction == UP) {
+                    xCoordinate += 1;
+                } else if (direction == RIGHT) {
+                    yCoordinate -= 1;
+                }
+            } else if (yCoordinate == 1) {
+                if (direction == DOWN) {
+                    xCoordinate += 1;
+                } else if (direction == RIGHT) {
+                    yCoordinate += 1;
+                }
+            } else {
+                if (direction == RIGHT) {
+                    yCoordinate += 1;
+                }
+            }
+        } else if (yCoordinate == 1) {
+            if (direction == DOWN) {
+                xCoordinate += 1;
+            }
+        } else if (yCoordinate == this.rows) {
+            if (direction == UP) {
+                xCoordinate += 1;
+            }
+        }
+    }
+    return [xCoordinate, yCoordinate];
+}
+
+/***
+ * Helping-function which calculates where it ought create new tail from the old one
+ * @param bodyPart Obj
  * @param direction int
  * @returns {position int}
  */
-Matrix.prototype.setPositionForNewBodyPart = function(bodyPart, direction) {
+Matrix.prototype.setPositionForNewTail = function(bodyPart, direction) {
     var xCoordinate = bodyPart.xCoordinate;
     var yCoordinate = bodyPart.yCoordinate;
+
+    var checkedOnBordersCoordinates = this.checkTheBorders(xCoordinate, yCoordinate, direction);
+
+    // if our tail is near border now, we already handled this situation
+    if (xCoordinate != checkedOnBordersCoordinates[0] || yCoordinate != checkedOnBordersCoordinates[1]) {
+        return checkedOnBordersCoordinates;
+    }
 
     switch(direction) {
         case LEFT:
@@ -314,7 +372,8 @@ Matrix.prototype.setPositionForNewBodyPart = function(bodyPart, direction) {
             yCoordinate = bodyPart.yCoordinate - 1;
             break;
     }
-    return coordinates = [xCoordinate, yCoordinate];
+
+    return [xCoordinate, yCoordinate];
 };
 
 /***
@@ -325,7 +384,7 @@ Matrix.prototype.setPositionForNewBodyPart = function(bodyPart, direction) {
  */
 Matrix.prototype.createBodyPart = function(snake, bodyAmount, direction) {
     if(bodyAmount == 1) {
-        var tailCoordinates = this.setPositionForNewBodyPart(snake[0], direction);
+        var tailCoordinates = this.setPositionForNewTail(snake[0], direction);
         var tail = new BodyPart(tailCoordinates[0], tailCoordinates[1], "tail", this.cols);
         snake[1] = tail;
         snake[1].direction = snake[0].direction;
@@ -333,7 +392,7 @@ Matrix.prototype.createBodyPart = function(snake, bodyAmount, direction) {
 
     } else {
         var oldTailBodyPart = bodyAmount - 1;
-        var newTailPosition = this.setPositionForNewBodyPart(
+        var newTailPosition = this.setPositionForNewTail(
             snake[oldTailBodyPart],
             snake[oldTailBodyPart].direction
         );
@@ -362,7 +421,7 @@ Matrix.prototype.createFood = function(food, snake) {
             food.position = this.generateRandomCell();
         }
     }
-    this.colouredCell(food.getPosition(), "food", UP);
+    this.colouredCell(food.position, "food", UP);
 };
 
 window.onload = function() {
@@ -388,7 +447,7 @@ window.onload = function() {
         document.getElementById('matrix').style.width = gridAmount * 20 + "px";
         document.getElementById('matrix').style.height = gridAmount * 20 + "px";
 
-        var head = new BodyPart(gridAmount/2, gridAmount/2, "head", myMatrix.cols);
+        var head = new BodyPart(Math.floor(gridAmount/ 2), Math.floor(gridAmount/ 2), "head", myMatrix.cols);
 
         // Snake appearance
         var snake = new Array();
