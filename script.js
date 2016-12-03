@@ -15,6 +15,60 @@ bodyPartColor = "#58C912";
 tailColor = "#1D6122";
 foodColor = "#cc0000";
 
+window.onload = function() {
+    $(".greetings input").click(function(e){
+        var name = $(e.target).attr('name');
+        var namesAmount = document.getElementsByName(name);
+
+        for(var i = 0; i < namesAmount.length; i++) {
+            $(namesAmount[i]).removeClass('active');
+        }
+        var className = $(this).attr('class');
+        $('.greetings label.' + className).addClass("active");
+    });
+    $('.start, .new-game').on('click', function(){
+
+        $("#matrix").addClass('active');
+
+        var gridAmount = (Number)(document.querySelector('input[name="gridAmount"]:checked').value);
+        var gameSpeed = (Number)(document.querySelector('input[name="gameLevel"]:checked').value);
+        $('.greetings').remove();
+
+        var myMatrix = new Matrix(gridAmount, gridAmount);
+        document.getElementById('matrix').style.width = gridAmount * 20 + "px";
+        document.getElementById('matrix').style.height = gridAmount * 20 + "px";
+
+        var head = new BodyPart(Math.floor(gridAmount/ 2), Math.floor(gridAmount/ 2), "head", myMatrix.cols);
+
+        // Snake appearance
+        var snake = new Array();
+        snake[0] = head;
+        myMatrix.colouredCell(snake[0].position, snake[0].role, snake[0].direction);
+
+        // Food appearance
+        var food = new Food();
+        myMatrix.createFood(food, snake);
+
+        myMatrix.timerId = setInterval(function() {
+            myMatrix.movingLoop(snake, food)
+        }, gameSpeed);
+
+        //Button click handler
+        document.onkeydown = function(event) {
+            if((event.keyCode >= 37) && (event.keyCode <= 40)) {
+                var keyCode = event.keyCode;
+                if (!(snake[0].direction == UP && keyCode == DOWN)
+                    && !(snake[0].direction == DOWN && keyCode == UP)
+                    && !(snake[0].direction == LEFT && keyCode == RIGHT)
+                    && !(snake[0].direction == RIGHT && keyCode == LEFT)) {
+
+                    snake[0].direction = keyCode;
+                }
+            }
+        }
+    });
+};
+
 /***
  * Class Matrix, which create field of DOM elements
  * @param rows int
@@ -422,58 +476,4 @@ Matrix.prototype.createFood = function(food, snake) {
         }
     }
     this.colouredCell(food.position, "food", UP);
-};
-
-window.onload = function() {
-    $(".greetings input").click(function(e){
-        var name = $(e.target).attr('name');
-        var namesAmount = document.getElementsByName(name);
-
-        for(var i = 0; i < namesAmount.length; i++) {
-            $(namesAmount[i]).removeClass('active');
-        }
-        var className = $(this).attr('class');
-        $('.greetings label.' + className).addClass("active");
-    });
-    $('.start, .new-game').on('click', function(){
-
-        $("#matrix").addClass('active');
-
-        var gridAmount = (Number)(document.querySelector('input[name="gridAmount"]:checked').value);
-        var gameSpeed = (Number)(document.querySelector('input[name="gameLevel"]:checked').value);
-        $('.greetings').remove();
-
-        var myMatrix = new Matrix(gridAmount, gridAmount);
-        document.getElementById('matrix').style.width = gridAmount * 20 + "px";
-        document.getElementById('matrix').style.height = gridAmount * 20 + "px";
-
-        var head = new BodyPart(Math.floor(gridAmount/ 2), Math.floor(gridAmount/ 2), "head", myMatrix.cols);
-
-        // Snake appearance
-        var snake = new Array();
-        snake[0] = head;
-        myMatrix.colouredCell(snake[0].position, snake[0].role, snake[0].direction);
-
-        // Food appearance
-        var food = new Food();
-        myMatrix.createFood(food, snake);
-
-        myMatrix.timerId = setInterval(function() {
-            myMatrix.movingLoop(snake, food)
-        }, gameSpeed);
-
-        //Button click handler
-        document.onkeydown = function(event) {
-            if((event.keyCode >= 37) && (event.keyCode <= 40)) {
-                var keyCode = event.keyCode;
-                if (!(snake[0].direction == UP && keyCode == DOWN)
-                    && !(snake[0].direction == DOWN && keyCode == UP)
-                    && !(snake[0].direction == LEFT && keyCode == RIGHT)
-                    && !(snake[0].direction == RIGHT && keyCode == LEFT)) {
-
-                    snake[0].direction = keyCode;
-                }
-            }
-        }
-    });
 };
