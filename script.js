@@ -71,8 +71,8 @@ window.onload = function() {
 
 /***
  * Class Matrix, which create field of DOM elements
- * @param rows int
  * @param cols int
+ * @param rows int
  */
 function Matrix(cols, rows) {
     this.cols = cols;
@@ -88,9 +88,7 @@ function Matrix(cols, rows) {
 }
 
 /***
- * Class Snake instance
- * @param rows int
- * @param cols int
+ * Snake Class
  */
 function Snake() {
     this.body = [];
@@ -180,7 +178,8 @@ Matrix.prototype.generateRandomCell = function() {
 
 /***
  * Check whether the cell, which must be painted or cleared doesn't contains the following color
- * @param partForCheck
+ * @param cellNumber int
+ * @param partForCheck int
  * @returns {boolean}
  */
 Matrix.prototype.checkThereIsNotColor = function(cellNumber, partForCheck) {
@@ -239,7 +238,7 @@ Matrix.prototype.uncolouredCell = function(cellNumber) {
  * @param myMatrix Obj
  * @returns {position int}
  */
-Snake.prototype.changePosition = function(currentCell, xChange, yChange, bodyRole, myMatrix) {
+Snake.prototype.changePosition = function(currentCell, xChange, yChange, myMatrix) {
     myMatrix.uncolouredCell(currentCell.position);
     currentCell.xCoordinate += xChange;
     currentCell.yCoordinate += yChange;
@@ -254,14 +253,14 @@ Snake.prototype.changePosition = function(currentCell, xChange, yChange, bodyRol
  * @param direction int
  * @param myMatrix Obj
  */
-Snake.prototype.moveIteration = function(bodyPart, direction, bodyRole, myMatrix) {
+Snake.prototype.moveIteration = function(bodyPart, direction, myMatrix) {
     switch(direction) {
         case LEFT:
             if ((bodyPart.position == 0) || (bodyPart.position % myMatrix.cols == 0)) {
                 myMatrix.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, -1, 0, bodyRole, myMatrix);
+            bodyPart.position = this.changePosition(bodyPart, -1, 0, myMatrix);
             break;
 
         case UP:
@@ -269,7 +268,7 @@ Snake.prototype.moveIteration = function(bodyPart, direction, bodyRole, myMatrix
                 myMatrix.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, 0, -1, bodyRole, myMatrix);
+            bodyPart.position = this.changePosition(bodyPart, 0, -1, myMatrix);
             break;
 
         case RIGHT:
@@ -277,7 +276,7 @@ Snake.prototype.moveIteration = function(bodyPart, direction, bodyRole, myMatrix
                 myMatrix.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, 1, 0, bodyRole, myMatrix);
+            bodyPart.position = this.changePosition(bodyPart, 1, 0, myMatrix);
             break;
 
         case DOWN:
@@ -285,7 +284,7 @@ Snake.prototype.moveIteration = function(bodyPart, direction, bodyRole, myMatrix
                 myMatrix.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, 0, 1, bodyRole, myMatrix);
+            bodyPart.position = this.changePosition(bodyPart, 0, 1, myMatrix);
             break;
     }
 };
@@ -300,7 +299,7 @@ Snake.prototype.moveIteration = function(bodyPart, direction, bodyRole, myMatrix
 Snake.prototype.move = function(myMatrix, bodyPart, direction) {
     if (bodyPart == 0) {
         this.body[bodyPart].direction = direction;
-        this.moveIteration(this.body[bodyPart], direction, this.body[bodyPart].role, myMatrix);
+        this.moveIteration(this.body[bodyPart], direction, myMatrix);
 
         for (var i = 1; i < this.body.length; i++) {
             if (this.body[bodyPart].position == this.body[i].position) {
@@ -308,7 +307,7 @@ Snake.prototype.move = function(myMatrix, bodyPart, direction) {
             }
         }
     } else {
-        this.moveIteration(this.body[bodyPart], this.body[bodyPart].direction, this.body[bodyPart].role, myMatrix);
+        this.moveIteration(this.body[bodyPart], this.body[bodyPart].direction, myMatrix);
 
         if(this.body[bodyPart].xCoordinate == this.body[bodyPart - 1].xCoordinate) {
 
@@ -342,7 +341,7 @@ Snake.prototype.movingLoop = function(myMatrix, food) {
 
     if (this.body[0].position == food.position) {
         food.remove();
-        this.createBodyPart(this.body[0].direction, myMatrix);
+        this.createBodyPart(myMatrix);
         setTimeout(myMatrix.createFood(food, this), 2000);
     }
 };
@@ -447,13 +446,14 @@ Snake.prototype.setPositionForNewTail = function(bodyPart, direction, myMatrix) 
  * Creating new body part after eating to became growing
  * @param snake Obj
  * @param bodyAmount
- * @param direction
+ * @param direction string
  */
-Snake.prototype.createBodyPart = function(direction, myMatrix) {
+Snake.prototype.createBodyPart = function(myMatrix) {
+    var headDirection = this.body[0].direction;
     var bodyAmount = this.body.length;
 
     if(bodyAmount == 1) {
-        var tailCoordinates = this.setPositionForNewTail(this.body[0], direction, myMatrix);
+        var tailCoordinates = this.setPositionForNewTail(this.body[0], headDirection, myMatrix);
         var tail = new BodyPart(tailCoordinates[0], tailCoordinates[1], "tail", myMatrix.cols);
         this.body[1] = tail;
         this.body[1].direction = this.body[0].direction;
