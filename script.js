@@ -238,7 +238,7 @@ Matrix.prototype.uncolouredCell = function(cellNumber) {
  * @param myMatrix Obj
  * @returns {position int}
  */
-Snake.prototype.changePosition = function(currentCell, xChange, yChange, myMatrix) {
+Snake.prototype.changePosition = function(currentCell, xChange, yChange, bodyRole, myMatrix) {
     myMatrix.uncolouredCell(currentCell.position);
     currentCell.xCoordinate += xChange;
     currentCell.yCoordinate += yChange;
@@ -253,14 +253,14 @@ Snake.prototype.changePosition = function(currentCell, xChange, yChange, myMatri
  * @param direction int
  * @param myMatrix Obj
  */
-Snake.prototype.moveIteration = function(bodyPart, direction, myMatrix) {
+Snake.prototype.moveIteration = function(bodyPart, direction, bodyRole, myMatrix) {
     switch(direction) {
         case LEFT:
             if ((bodyPart.position == 0) || (bodyPart.position % myMatrix.cols == 0)) {
                 myMatrix.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, -1, 0, myMatrix);
+            bodyPart.position = this.changePosition(bodyPart, -1, 0, bodyRole, myMatrix);
             break;
 
         case UP:
@@ -268,7 +268,7 @@ Snake.prototype.moveIteration = function(bodyPart, direction, myMatrix) {
                 myMatrix.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, 0, -1, myMatrix);
+            bodyPart.position = this.changePosition(bodyPart, 0, -1, bodyRole, myMatrix);
             break;
 
         case RIGHT:
@@ -276,7 +276,7 @@ Snake.prototype.moveIteration = function(bodyPart, direction, myMatrix) {
                 myMatrix.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, 1, 0, myMatrix);
+            bodyPart.position = this.changePosition(bodyPart, 1, 0, bodyRole, myMatrix);
             break;
 
         case DOWN:
@@ -284,7 +284,7 @@ Snake.prototype.moveIteration = function(bodyPart, direction, myMatrix) {
                 myMatrix.gameOver("crash");
                 break;
             }
-            bodyPart.position = this.changePosition(bodyPart, 0, 1, myMatrix);
+            bodyPart.position = this.changePosition(bodyPart, 0, 1, bodyRole, myMatrix);
             break;
     }
 };
@@ -299,7 +299,7 @@ Snake.prototype.moveIteration = function(bodyPart, direction, myMatrix) {
 Snake.prototype.move = function(myMatrix, bodyPart, direction) {
     if (bodyPart == 0) {
         this.body[bodyPart].direction = direction;
-        this.moveIteration(this.body[bodyPart], direction, myMatrix);
+        this.moveIteration(this.body[bodyPart], direction, this.body[bodyPart].role, myMatrix);
 
         for (var i = 1; i < this.body.length; i++) {
             if (this.body[bodyPart].position == this.body[i].position) {
@@ -307,7 +307,7 @@ Snake.prototype.move = function(myMatrix, bodyPart, direction) {
             }
         }
     } else {
-        this.moveIteration(this.body[bodyPart], this.body[bodyPart].direction, myMatrix);
+        this.moveIteration(this.body[bodyPart], this.body[bodyPart].direction, this.body[bodyPart].role, myMatrix);
 
         if(this.body[bodyPart].xCoordinate == this.body[bodyPart - 1].xCoordinate) {
 
