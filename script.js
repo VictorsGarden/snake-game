@@ -71,8 +71,8 @@ window.onload = function() {
 
 /***
  * Class Matrix, which create field of DOM elements
- * @param cols int
- * @param rows int
+ * @param {number} cols
+ * @param {number} rows
  */
 function Matrix(cols, rows) {
     this.cols = cols;
@@ -110,10 +110,10 @@ Food.prototype.remove = function() {
 
 /***
  * BodyPart Class
- * @param xCoordinate int
- * @param yCoordinate int
- * @param role string
- * @param colsAmount int
+ * @param {number} xCoordinate
+ * @param {number} yCoordinate
+ * @param {string} role
+ * @param {number} colsAmount
  */
 function BodyPart(xCoordinate, yCoordinate, role, colsAmount) {
     this.xCoordinate = xCoordinate;
@@ -125,7 +125,7 @@ function BodyPart(xCoordinate, yCoordinate, role, colsAmount) {
 
 /***
  * Overing a game by two different causes - smashing into the wall and eat itself - uroboros =)
- * @param cause string
+ * @param {string} cause
  */
 Matrix.prototype.gameOver = function(cause) {
     clearInterval(this.timerId);
@@ -148,8 +148,8 @@ Matrix.prototype.gameOver = function(cause) {
 };
 
 /***
- * @param diapason int
- * @returns {int}
+ * @param {number} diapason
+ * @returns {number}
  */
 Matrix.prototype.generateRandomCoordinate = function(diapason) {
     return Math.floor(Math.random() * diapason + 1);
@@ -157,10 +157,10 @@ Matrix.prototype.generateRandomCoordinate = function(diapason) {
 
 /***
  * Calculating position of cell using it's coordinates
- * @param xCoordinate int
- * @param yCoordinate int
- * @param colsAmount
- * @returns {int}
+ * @param {number} xCoordinate
+ * @param {number} yCoordinate
+ * @param {number} colsAmount
+ * @returns {number}
  */
 calculateCellPosition = function(xCoordinate, yCoordinate, colsAmount) {
     return (yCoordinate - 1) * colsAmount + xCoordinate;
@@ -168,7 +168,7 @@ calculateCellPosition = function(xCoordinate, yCoordinate, colsAmount) {
 
 /***
  * Generate cell with random X and Y coordinates
- * @returns {int}
+ * @returns {number}
  */
 Matrix.prototype.generateRandomCell = function() {
     var randomXCoordinate = this.generateRandomCoordinate(this.cols);
@@ -178,8 +178,8 @@ Matrix.prototype.generateRandomCell = function() {
 
 /***
  * Check whether the cell, which must be painted or cleared doesn't contains the following color
- * @param cellNumber int
- * @param partForCheck int
+ * @param {number} cellNumber
+ * @param {number} partForCheck
  * @returns {boolean}
  */
 Matrix.prototype.checkThereIsNotColor = function(cellNumber, partForCheck) {
@@ -188,8 +188,8 @@ Matrix.prototype.checkThereIsNotColor = function(cellNumber, partForCheck) {
 
 /***
  * Coloured cell according to it's role for game
- * @param cellNumber int
- * @param bodyRole string
+ * @param {number} cellNumber
+ * @param {string} bodyRole
  */
 Matrix.prototype.colouredCell = function(cellNumber, bodyRole) {
     switch (bodyRole) {
@@ -221,7 +221,7 @@ Matrix.prototype.colouredCell = function(cellNumber, bodyRole) {
 
 /***
  * Clear cell's colour to default
- * @param cellNumber int
+ * @param {number} cellNumber
  */
 Matrix.prototype.uncolouredCell = function(cellNumber) {
     if(this.checkThereIsNotColor(cellNumber, tailColor)){
@@ -232,11 +232,11 @@ Matrix.prototype.uncolouredCell = function(cellNumber) {
 /***
  * The very basic iteration for change colour to old
  * and give it to the new cell's position
- * @param currentCell int
- * @param xChange int
- * @param yChange int
- * @param myMatrix Obj
- * @returns {position int}
+ * @param {number} currentCell
+ * @param {number} xChange
+ * @param {number} yChange
+ * @param {Matrix} myMatrix
+ * @returns {number}
  */
 Snake.prototype.changePosition = function(currentCell, xChange, yChange, bodyRole, myMatrix) {
     myMatrix.uncolouredCell(currentCell.position);
@@ -249,9 +249,9 @@ Snake.prototype.changePosition = function(currentCell, xChange, yChange, bodyRol
 
 /***
  * One basic iteration for change position according to new direction
- * @param bodyPart Obj
- * @param direction int
- * @param myMatrix Obj
+ * @param {BodyPart} bodyPart
+ * @param {number} direction
+ * @param {Matrix} myMatrix
  */
 Snake.prototype.moveIteration = function(bodyPart, direction, bodyRole, myMatrix) {
     switch(direction) {
@@ -292,9 +292,9 @@ Snake.prototype.moveIteration = function(bodyPart, direction, bodyRole, myMatrix
 /***
  * The main function of this entire game
  * which do smart algorithm to find new way for moving
- * @param matrix Obj
- * @param bodyPart Obj
- * @param direction int
+ * @param {Matrix} matrix
+ * @param {BodyPart} bodyPart
+ * @param {number} direction
  */
 Snake.prototype.move = function(myMatrix, bodyPart, direction) {
     if (bodyPart == 0) {
@@ -331,8 +331,8 @@ Snake.prototype.move = function(myMatrix, bodyPart, direction) {
 
 /***
  * Moving entire snake's body
- * @param myMatrix Obj
- * @param food Obj
+ * @param {Matrix} myMatrix
+ * @param {Food} food
  */
 Snake.prototype.movingLoop = function(myMatrix, food) {
     for (var i = 0; i < this.body.length; i++) {
@@ -342,16 +342,16 @@ Snake.prototype.movingLoop = function(myMatrix, food) {
     if (this.body[0].position == food.position) {
         food.remove();
         this.createBodyPart(myMatrix);
-        setTimeout(myMatrix.createFood(food, this), 2000);
+        myMatrix.createFood(food, this);
     }
 };
 
 /***
  * Check in all cases whether the current tail not near borders and handle all situations if it is
- * @param xCoordinate int
- * @param yCoordinate int
- * @param direction
- * @returns {int[]}
+ * @param {number} xCoordinate
+ * @param {number} yCoordinate
+ * @param {number} direction
+ * @returns {Array<Number>}
  */
 Matrix.prototype.checkTheBorders = function(xCoordinate, yCoordinate, direction) {
     if(xCoordinate % this.cols == (this.cols - 1) || xCoordinate == 0 ||
@@ -408,10 +408,10 @@ Matrix.prototype.checkTheBorders = function(xCoordinate, yCoordinate, direction)
 
 /***
  * Helping-function which calculates where it ought create new tail from the old one
- * @param bodyPart Obj
- * @param direction int
- * @param myMatrix Obj
- * @returns {position int}
+ * @param {BodyPart} bodyPart
+ * @param {number} direction
+ * @param {Matrix} myMatrix
+ * @returns {number}
  */
 Snake.prototype.setPositionForNewTail = function(bodyPart, direction, myMatrix) {
     var xCoordinate = bodyPart.xCoordinate;
@@ -444,9 +444,7 @@ Snake.prototype.setPositionForNewTail = function(bodyPart, direction, myMatrix) 
 
 /***
  * Creating new body part after eating to became growing
- * @param snake Obj
- * @param bodyAmount
- * @param direction string
+ * @param {Matrix} myMatrix
  */
 Snake.prototype.createBodyPart = function(myMatrix) {
     var headDirection = this.body[0].direction;
@@ -478,8 +476,8 @@ Snake.prototype.createBodyPart = function(myMatrix) {
 
 /***
  * Creating random food cell within the matrix instance
- * @param food Obj
- * @param snake Obj
+ * @param {Food} food
+ * @param {Snake} snake
  */
 Matrix.prototype.createFood = function(food, snake) {
     food.position = this.generateRandomCell();
